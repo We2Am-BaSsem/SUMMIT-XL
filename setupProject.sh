@@ -22,9 +22,9 @@ git clone https://github.com/RobotnikAutomation/robotnik_msgs.git
 git clone https://github.com/RobotnikAutomation/robotnik_sensors.git
 
 cd ..
-make_project
+catkin_make
 
-source ./devel/setup.bash
+source ./devel/setup.bash & echo 'sourced ./devel/setup.bash'
 
 echo "source $(pwd)/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
