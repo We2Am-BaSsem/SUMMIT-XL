@@ -15,6 +15,13 @@ apt_command+=" -y"
 # Run the command
 eval $apt_command
 
+cd ./src
+git clone https://github.com/RobotnikAutomation/summit_xl_common.git
+git clone https://github.com/RobotnikAutomation/summit_xl_sim.git
+git clone https://github.com/RobotnikAutomation/robotnik_msgs.git
+git clone https://github.com/RobotnikAutomation/robotnik_sensors.git
+
+cd ..
 make_project
 
 source ./devel/setup.bash
