@@ -52,7 +52,7 @@ CATKIN_IGNORE
 
 
 
-
+.vscode
 src/robotnik_msgs
 src/robotnik_sensors
 src/summit_xl_common
