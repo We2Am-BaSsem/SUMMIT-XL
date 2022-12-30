@@ -37,7 +37,7 @@ def main():
                 # Calculate the angle of the laser reading in the robot's frame
                 angle = data1.Laser_reading.angle_min + i * data1.Laser_reading.angle_increment
                 # Calculate the angle of the laser reading in the map's frame
-                angle = angle + data2.transforms[0].transform.rotation.z + math.radians(90)
+                angle = angle + data2.transforms[0].transform.rotation.z + math.radians(0)
                 # Calculate the distance of the laser reading in x,y in the robot's frame
                 x = data1.Laser_reading.ranges[i] * math.cos(angle)
                 y = data1.Laser_reading.ranges[i] * math.sin(angle)
@@ -52,12 +52,20 @@ def main():
                 # increment the hits list for the cell
                 hits_map[index] = hits_map[index] + 1
                 # loop through all cells between the robot and the laser reading
-                for x_d in np.arange(data2.transforms[0].transform.translation.x, endx, my_map.info.resolution):
-                    for y_d in np.arange(data2.transforms[0].transform.translation.y, endy, my_map.info.resolution):
-                        # Calculate the index of the map cell that the laser reading corresponds to
-                        index = int((x_d - my_map.info.origin.position.x) / my_map.info.resolution) + int((y_d - my_map.info.origin.position.y) / my_map.info.resolution) * my_map.info.width
-                        # increment the misses list for the cell
-                        misses_map[index] = misses_map[index] + 1
+                xs = np.arange(data2.transforms[0].transform.translation.x, endx, my_map.info.resolution)
+                ys = np.arange(data2.transforms[0].transform.translation.y, endy, my_map.info.resolution)
+                min_length = math.min(len(xs), len(ys))
+                xs = xs[:min_length]
+                ys = ys[:min_length]
+                misses_map[ys * my_map.info.width + xs] += 1
+            
+                
+                #for x_d in np.arange(data2.transforms[0].transform.translation.x, endx, my_map.info.resolution):
+                #    for y_d in np.arange(data2.transforms[0].transform.translation.y, endy, my_map.info.resolution):
+                #        # Calculate the index of the map cell that the laser reading corresponds to
+                #        index = int((x_d - my_map.info.origin.position.x) / my_map.info.resolution) + int((y_d - my_map.info.origin.position.y) / my_map.info.resolution) * my_map.info.width
+                #        # increment the misses list for the cell
+                #        misses_map[index] = misses_map[index] + 1
             
             # Update the map data to be probability of occupancy
             for i in range(len(my_map.data)):
