@@ -9,14 +9,12 @@ import message_filters
 from sensor_alignment.msg import Sensors_topic
 
 def main():
-    def callback(data1, data2, data3):
+    def callback(data1, data2):
         msg = Sensors_topic()
         msg.Laser_reading = data1
-        msg.odometry = data3
-        # compine ranges in one range in the same axis 
-        msg.Laser_reading.ranges = data1.ranges + data2.ranges
-        msg.Laser_reading.intensities = data1.intensities + data2.intensities
+        msg.odometry = data2
         pub.publish(msg)
+        rospy.loginfo(data1)
         
     node_name = "input_sensors_alignment"
     
@@ -24,9 +22,9 @@ def main():
     rospy.init_node(node_name, anonymous=True)
     rospy.loginfo("%s is now running", node_name)
     
-    
-    topics = ['/robot/front_laser/scan', '/robot/rear_laser/scan', '/robot/robotnik_base_control/odom']
-    types = [LaserScan, LaserScan, Odometry]
+    # Log data of the laser topic
+    topics = ['/scan_multi', '/robot/robotnik_base_control/odom']
+    types = [LaserScan, Odometry]
 
     subs = [message_filters.Subscriber(topic, mtype) for topic, mtype in zip(topics, types)]
     ts = message_filters.ApproximateTimeSynchronizer(subs, 10, 0.01, allow_headerless=True)

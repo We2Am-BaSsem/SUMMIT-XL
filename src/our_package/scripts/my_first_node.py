@@ -49,13 +49,13 @@ def main():
         if user_input == 'w':
             # forward
             msg.linear.x = 1.0
-            msg.linear.y = 1.0
-            msg.linear.z = 1.0
+            # msg.linear.y = 1.0
+            # msg.linear.z = 1.0
         if user_input == 's':
             # backward
             msg.linear.x = -1.0
-            msg.linear.y = -1.0
-            msg.linear.z = -1.0
+            # msg.linear.y = -1.0
+            # msg.linear.z = -1.0
             
         
         rospy.loginfo('Key pressed: ' + user_input)
