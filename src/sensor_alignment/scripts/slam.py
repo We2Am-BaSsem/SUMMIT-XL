@@ -94,7 +94,7 @@ def callback(data):
 
 def main():
     global my_map, pub, hits, misses, robotX, robotY, robotOrientation, prevTime, currTime
-    node_name = "mapping_poses"
+    node_name = "slam"
     rospy.init_node(node_name, anonymous=True)
     rospy.loginfo("%s is now running", node_name)
     currTime = rospy.Time.now()
