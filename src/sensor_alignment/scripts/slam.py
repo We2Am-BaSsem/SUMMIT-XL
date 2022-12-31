@@ -8,7 +8,6 @@ import message_filters
 from sensor_alignment.msg import Sensors_topic
 from nav_msgs.msg import Odometry, OccupancyGrid
 from tf2_msgs.msg import TFMessage
-import numpy as np
 import math
 import tf
 my_map = None
@@ -16,11 +15,20 @@ pub = None
 hits = None
 misses = None
 
+robotX = 0
+robotY = 0
+robotOrientation = 0
+
+
+
+prevTime = None
+currTime = None
+
 def create_map():
     #create the map
     map = OccupancyGrid()
     map.header.frame_id = 'robot_map'
-    map.header.stamp = rospy.rostime.Time()
+    map.header.stamp = rospy.Time.now()
     map.header.seq = 0
     map.info.resolution = 0.5
     map.info.width = 4992
@@ -35,13 +43,22 @@ def create_map():
     map.data = [-1] * (map.info.width * map.info.height)
     return map
 
+
+
 def callback(data):
-    global my_map, pub, hits, misses
+    global my_map, pub, hits, misses, robotX, robotY, robotOrientation, prevTime, currTime
     # Loop through the laser readings and update the map
-    robotX = data.odometry.pose.pose.position.x
-    robotY = data.odometry.pose.pose.position.y
-    robotOrientation = data.odometry.pose.pose.orientation
-    _, _, robotOrientation = tf.transformations.euler_from_quaternion([robotOrientation.x, robotOrientation.y, robotOrientation.z, robotOrientation.w])
+    currTime = rospy.Time.now()
+    robotX = robotX + (data.odometry.twist.twist.linear.x * math.cos(robotOrientation) * (currTime - prevTime).to_sec())
+    robotY = robotY + (data.odometry.twist.twist.linear.x * math.sin(robotOrientation) * (currTime - prevTime).to_sec())
+    robotOrientation = robotOrientation + (data.odometry.twist.twist.angular.z * (currTime - prevTime).to_sec())
+    # rospy.loginfo("Predected Orientation: %f", robotOrientation)
+    prevTime = currTime
+    # robotX = data.odometry.pose.pose.position.x
+    # robotY = data.odometry.pose.pose.position.y
+    # robotOrientation = tf.transformations.euler_from_quaternion([data.odometry.pose.pose.orientation.x, data.odometry.pose.pose.orientation.y, data.odometry.pose.pose.orientation.z, data.odometry.pose.pose.orientation.w])[2]
+    # rospy.loginfo("Actual Orientation: %f", robotOrientation)
+
     for i in range(len(data.Laser_reading.ranges)):
         if data.Laser_reading.ranges[i] >= data.Laser_reading.range_max or data.Laser_reading.ranges[i] <= data.Laser_reading.range_min:
             continue
@@ -70,26 +87,24 @@ def callback(data):
                 misses[index] = min(misses[index] + 1, 100)
                 my_map.data[index] = int(100 * hits[index] / (hits[index] + misses[index]))
     my_map.header.seq = my_map.header.seq + 1
-    my_map.header.stamp = rospy.rostime.Time()
+    my_map.header.stamp = rospy.Time.now()
     # Publish the map
     rospy.loginfo("Publishing map")
-    rospy.loginfo("Robot x: %f, y: %f, orientation: %f", robotX, robotY, robotOrientation)
     pub.publish(my_map)
 
 def main():
-    global my_map, pub, hits, misses
-    my_map = create_map()
-    hits = [0] * (my_map.info.width * my_map.info.height)
-    misses = [0] * (my_map.info.width * my_map.info.height)
+    global my_map, pub, hits, misses, robotX, robotY, robotOrientation, prevTime, currTime
     node_name = "mapping_poses"
     rospy.init_node(node_name, anonymous=True)
     rospy.loginfo("%s is now running", node_name)
-    topics = ['/sensor_alignment','/tf']
-    types = [Sensors_topic,TFMessage]
-    subs = [message_filters.Subscriber(topic, mtype) for topic, mtype in zip(topics, types)]
-    ts = message_filters.ApproximateTimeSynchronizer(subs, 10, 0.01, allow_headerless=True)
-    ts.registerCallback(callback)
-    pub = rospy.Publisher('Mapping', OccupancyGrid, queue_size=10)
+    currTime = rospy.Time.now()
+    prevTime = rospy.Time.now()
+    my_map = create_map()
+    hits = [0] * (my_map.info.width * my_map.info.height)
+    misses = [0] * (my_map.info.width * my_map.info.height)
+    topic = '/sensor_alignment'
+    sub = rospy.Subscriber(topic, Sensors_topic, callback)
+    pub = rospy.Publisher('Mapping', OccupancyGrid, queue_size=1)
     rospy.spin()
 
 
