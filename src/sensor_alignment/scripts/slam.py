@@ -54,9 +54,11 @@ def callback(data):
     robotOrientation = robotOrientation + (data.odometry.twist.twist.angular.z * (currTime - prevTime).to_sec())
     # rospy.loginfo("Predected Orientation: %f", robotOrientation)
     prevTime = currTime
-    # robotX = data.odometry.pose.pose.position.x
-    # robotY = data.odometry.pose.pose.position.y
-    # robotOrientation = tf.transformations.euler_from_quaternion([data.odometry.pose.pose.orientation.x, data.odometry.pose.pose.orientation.y, data.odometry.pose.pose.orientation.z, data.odometry.pose.pose.orientation.w])[2]
+    act_robotOrientation = tf.transformations.euler_from_quaternion([data.odometry.pose.pose.orientation.x, data.odometry.pose.pose.orientation.y, data.odometry.pose.pose.orientation.z, data.odometry.pose.pose.orientation.w])[2]
+    K = 0.5
+    robotX = robotX + K * (data.odometry.pose.pose.position.x - robotX)
+    robotY = robotY + K * (data.odometry.pose.pose.position.y - robotY)
+    robotOrientation = robotOrientation + K * (act_robotOrientation - robotOrientation)
     # rospy.loginfo("Actual Orientation: %f", robotOrientation)
 
     for i in range(len(data.Laser_reading.ranges)):

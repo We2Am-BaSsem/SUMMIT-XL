@@ -35,7 +35,7 @@ def create_map():
     map.data = [-1] * (map.info.width * map.info.height)
     return map
 
-def callback(data):
+def callback(data, _):
     global my_map, pub, hits, misses
     # Loop through the laser readings and update the map
     robotX = data.odometry.pose.pose.position.x

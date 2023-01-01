@@ -14,7 +14,6 @@ def main():
         msg.Laser_reading = data1
         msg.odometry = data2
         pub.publish(msg)
-        rospy.loginfo(data1)
         
     node_name = "input_sensors_alignment"
     

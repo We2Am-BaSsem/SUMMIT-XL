@@ -1,1 +1,1 @@
-rosrun sensor_alignmen slam.py
+rosrun sensor_alignment slam.py
