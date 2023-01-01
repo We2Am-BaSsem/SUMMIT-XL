@@ -22,7 +22,7 @@ def create_map():
     map.header.frame_id = 'robot_map'
     map.header.stamp = rospy.rostime.Time()
     map.header.seq = 0
-    map.info.resolution = 0.5
+    map.info.resolution = 0.05
     map.info.width = 4992
     map.info.height = 4992
     map.info.origin.position.x = 0.03 - map.info.resolution * map.info.width/2

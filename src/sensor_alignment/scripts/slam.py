@@ -28,7 +28,7 @@ def create_map():
     #create the map
     map = OccupancyGrid()
     map.header.frame_id = 'robot_map'
-    map.header.stamp = rospy.Time.now()
+    map.header.stamp = rospy.rostime.Time()
     map.header.seq = 0
     map.info.resolution = 0.5
     map.info.width = 4992
@@ -89,7 +89,7 @@ def callback(data):
                 misses[index] = min(misses[index] + 1, 100)
                 my_map.data[index] = int(100 * hits[index] / (hits[index] + misses[index]))
     my_map.header.seq = my_map.header.seq + 1
-    my_map.header.stamp = rospy.Time.now()
+    my_map.header.stamp = rospy.rostime.Time()
     # Publish the map
     rospy.loginfo("Publishing map")
     pub.publish(my_map)
@@ -99,8 +99,8 @@ def main():
     node_name = "slam"
     rospy.init_node(node_name, anonymous=True)
     rospy.loginfo("%s is now running", node_name)
-    currTime = rospy.Time.now()
-    prevTime = rospy.Time.now()
+    currTime = rospy.rostime.Time()
+    prevTime = rospy.rostime.Time()
     my_map = create_map()
     hits = [0] * (my_map.info.width * my_map.info.height)
     misses = [0] * (my_map.info.width * my_map.info.height)
