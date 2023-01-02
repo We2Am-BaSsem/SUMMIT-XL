@@ -57,3 +57,4 @@ src/robotnik_msgs
 src/robotnik_sensors
 src/summit_xl_common
 src/summit_xl_sim
+src/ira_laser_tools

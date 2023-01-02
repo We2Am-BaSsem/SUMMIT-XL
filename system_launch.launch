@@ -1,0 +1,6 @@
+<launch>
+<node pkg="sensor_alignment" name="input_listener" type="robot_controller.py" output="screen"></node>
+<node pkg="sensor_alignment" name="mapping_poses" type="mapping_poses.py" output="screen"></node>
+<node pkg="sensor_alignment" name="input_sensors_alignment" type="sensor_incorporating.py" output="screen"></node>
+<node pkg="sensor_alignment" name="slam" type="slam.py" output="screen"></node>
+</launch>
